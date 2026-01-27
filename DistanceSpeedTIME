@@ -1,0 +1,135 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true),
+      home: const TripTime(),
+    );
+  }
+}
+
+class TripTime extends StatefulWidget {
+  const TripTime({super.key});
+
+  @override
+  State<TripTime> createState() => _TripTimeState();
+}
+
+class _TripTimeState extends State<TripTime> {
+  final TextEditingController distance = TextEditingController(text: "300");
+  final TextEditingController speed = TextEditingController(text: "80");
+  final TextEditingController breaks = TextEditingController(text: "1.5");
+  
+  double driveTime = 0.0;
+  double totalTime = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    calculate();
+  }
+
+  void calculate() {
+    final d = double.tryParse(distance.text) ?? 0.0;
+    final s = double.tryParse(speed.text) ?? 0.0;
+    final b = double.tryParse(breaks.text) ?? 0.0;
+    
+    if (s > 0) {
+      setState(() {
+        driveTime = d / s;
+        totalTime = driveTime + b;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Trip Calculator')),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            // RESULT
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Text(
+                      "${totalTime.toStringAsFixed(1)} hours",
+                      style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Driving: ${driveTime.toStringAsFixed(1)}h + Breaks: ${breaks.text}h",
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // INPUTS
+            TextField(
+              controller: distance,
+              decoration: const InputDecoration(
+                labelText: 'Distance (km)',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (_) => calculate(),
+            ),
+
+            const SizedBox(height: 15),
+
+            TextField(
+              controller: speed,
+              decoration: const InputDecoration(
+                labelText: 'Speed (km/h)',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (_) => calculate(),
+            ),
+
+            const SizedBox(height: 15),
+
+            TextField(
+              controller: breaks,
+              decoration: const InputDecoration(
+                labelText: 'Break Time (hours)',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+              onChanged: (_) => calculate(),
+            ),
+
+            const SizedBox(height: 20),
+
+            // VALUES SUMMARY
+            const Text('Your Trip:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text("Distance: ${distance.text} km"),
+                Text("Speed: ${speed.text} km/h"),
+                Text("Breaks: ${breaks.text} h"),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
